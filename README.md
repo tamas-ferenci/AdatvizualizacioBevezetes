@@ -251,7 +251,8 @@ A másik lehetőség, hogy kis részábrákat, paneleket alkalmazunk:
 
 ``` r
 xyplot( Inc ~ Age | Sex,
-        data = RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015, .( Inc = sum( N )/sum( Population )*100000 ),
+        data = RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015,
+                        .( Inc = sum( N )/sum( Population )*100000 ),
                         .( Age, Sex ) ],
         type = "l" )
 ```
@@ -322,12 +323,13 @@ xYplot( Cbind( est*100000, cilwr*100000, ciupr*100000 ) ~ Age | factor( Year ), 
         data = RawData[ ICDCode=="C18",
                         with( binom.test( sum( N ), round( sum( Population ) ) ),
                               list( est = estimate, cilwr = conf.int[ 1 ], ciupr = conf.int[ 2 ] ) ),
-                        .( Age, Sex, Year ) ], type = "l", as.table = TRUE )
+                        .( Age, Sex, Year ) ],
+        type = "l", as.table = TRUE )
 ```
 
 ![](README_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-Eljutottunk oda, egyszerű lépések összerakásával, hogy ilyen ábrát már igazán nem lenne könnyű más módon előállítani! A dolog igazi ereje, hogy mindezt 5 sorban, de ami még jobb, úgy, hogy a kód kis gyakorlattal szinte kiolvasható mint egy angol mondat.
+Eljutottunk oda, egyszerű lépések összerakásával, hogy ilyen ábrát már igazán nem lenne könnyű más módon előállítani! A dolog igazi ereje, hogy mindezt 6 sorban, de ami még jobb, úgy, hogy a kód kis gyakorlattal szinte kiolvasható mint egy angol mondat.
 
 Interaktívvá tétel webes felületen
 ----------------------------------
