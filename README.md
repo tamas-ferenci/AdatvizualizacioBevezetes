@@ -1,0 +1,2 @@
+# AdatvizualizacioBevezetes
+Az adatvizualizáció néhány alapgondolatának bemutatása
