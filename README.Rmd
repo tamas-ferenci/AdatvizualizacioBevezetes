@@ -3,13 +3,8 @@ title: "Adatvizualizáció demonstráció"
 output: github_document
 ---
 
-<style>
-body {
-text-align: justify}
-</style>
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.align='center')
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Ez a dokumentum az adatvizualizáció néhány gondolatát kívánja szemléltetni egy konkrét példán. Nem bevezetést szeretne adni, hanem sokkal inkább motivációt, hogy az adatvizualizáció

@@ -1,11 +1,6 @@
 Adatvizualizáció demonstráció
 ================
 
-<style>
-body {
-text-align: justify}
-</style>
-
 Ez a dokumentum az adatvizualizáció néhány gondolatát kívánja
 szemléltetni egy konkrét példán. Nem bevezetést szeretne adni, hanem
 sokkal inkább motivációt, hogy az adatvizualizáció
@@ -140,7 +135,7 @@ xyplot( N/Population*1e5 ~ Age,
         type = "l" )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Itt most kézzel számoltuk ki az incidenciát, de elegánsabb (és a
 későbbiekben jobban használható), ha ezt is az adatbázisban tesszük
@@ -215,7 +210,7 @@ xyplot( Inc ~ Age,
         type = "l" )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ## Dimenziótól megszabadulás aggregálással
 
@@ -271,7 +266,7 @@ xyplot( Inc ~ Age,
         type = "l" )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 Természetesen nem muszáj csak egy dimenzió felett aggregálni. Mondjuk,
 hogy nem csak az összes megyére, hanem mindkét nemre vonatkozó adatokat
@@ -286,7 +281,7 @@ xyplot( Inc ~ Age,
         type = "l" )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 Az elv tehát nagyon egyszerű: ami szerint szeretnénk szűkíteni, azt
 írjuk bele a szűkítési listába – amit pedig nem írunk bele, a fölött
@@ -362,7 +357,7 @@ xyplot( Inc ~ Age, groups = Sex,
         type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ) )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Általánosságban az mondható, hogy ez a módszer teszi a görbéket jobban
 összehasonlíthatóvá, hiszen egymáson futnak (persze
@@ -380,7 +375,7 @@ xyplot( Inc ~ Age | Sex,
         type = "l", layout = c( 2, 1 ) )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Itt az összevetés nehezebb, hiszen nem ugyanott vannak a görbék. De egy
 dologra fontos emlékeznünk: ha az érdekel minket, hogy a görbe
@@ -404,7 +399,7 @@ xyplot( Inc ~ Age | factor( Year ), groups = Sex,
         type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ), as.table = TRUE )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Fontos végiggondolni, hogy ez mit mutat meg jól\! Mivel a nemek vannak
 különböző színnel ábrázolva, ezért azok vethetőek jól össze, az évek,
@@ -418,7 +413,7 @@ xyplot( Inc ~ Age | Sex, groups = factor( Year ),
         type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ), as.table = TRUE )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 A probléma itt az, hogy a rengeteg szín miatt nehezen áttekinthető az
 ábra (ennél kicsit több is igaz: mivel a `lattice` egy idő után elkezdi
@@ -437,7 +432,7 @@ xyplot( Inc ~ Age | Sex, groups = factor( Year ),
                 col = colorRampPalette( c( "green", "red" ) )( length( unique( RawData$Year ) ) ) ) ) )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Lehet, hogy az egyes konkrét éveket továbbra is nehéz leolvasni, de az
 *össztendencia* tökéletesen láthatóvá vált (férfiaknál romló helyzet
@@ -469,7 +464,7 @@ xYplot( Inc ~ Age | factor( Year ), groups = Sex,
         type = "l", as.table = TRUE )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Az igazi ereje azonban az a csomagnak, hogy konfidenciaintervallumok
 játszi könnyedséggel ábrázolhatóak. Ezek kiszámolása nem nehéz (egy
@@ -515,7 +510,7 @@ xYplot( Cbind( est*1e5, cilwr*1e5, ciupr*1e5 ) ~ Age | factor( Year ), groups = 
                         .( Age, Sex, Year ) ], type = "l", as.table = TRUE )
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Eljutottunk oda, egyszerű lépések összerakásával, hogy ilyen ábrát már
 igazán nem lenne könnyű más módon előállítani\! A dolog igazi ereje,
