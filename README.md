@@ -1,15 +1,34 @@
 Adatvizualizáció demonstráció
 ================
 
-Ez a dokumentum az adatvizualizáció néhány gondolatát kívánja szemléltetni egy konkrét példán. Nem bevezetést szeretne adni, hanem sokkal inkább motivációt, hogy az adatvizualizáció
+<style>
+body {
+text-align: justify}
+</style>
 
--   miért fontos,
--   hogyan lehet elemi építőkövekből akár egészen bonyolult vizualizációkat is összerakni,
--   végezetül, hogy mindez milyen hatékonyan megvalósítható az `R` (és megfelelő csomagok) használatával.
+Ez a dokumentum az adatvizualizáció néhány gondolatát kívánja
+szemléltetni egy konkrét példán. Nem bevezetést szeretne adni, hanem
+sokkal inkább motivációt, hogy az adatvizualizáció
 
-A konkrét esettanulmányunk a [Nemzeti Rákregiszter](http://www.onkol.hu/hu/nemzeti_rakregiszter) (NRR) adatainak vizualizálása lesz. Az NRR hazánk egyik legnagyobb hagyományú betegségregisztere, melye a rákos esetek számát gyűjti átfogóan, több mint egy évtizedre visszamenően Magyarországon. Ami a mostani szempontunkból még fontosabb, az adatok nyilvánosan elérhetőek, sőt, le is bonthatóak ráktípus (diagnózis), diagnózis éve, beteg életkora, neme és lakhelye (megye szinte) szerint. Ezért a többdimenziós adatvizualizálásra is kitűnő példa, ráadásul könnyen megfogalmazhatóak olyan kérdések, melyek - tényleg - fontosak a gyakorlatban, és melyeknél az adatvizualizáció nagyon fontos segítséget jelent.
+  - miért fontos,
+  - hogyan lehet elemi építőkövekből akár egészen bonyolult
+    vizualizációkat is összerakni,
+  - végezetül, hogy mindez milyen hatékonyan megvalósítható az `R` (és
+    megfelelő csomagok: `data.table` és `lattice`) használatával.
 
-Nézzük is ezt meg! Először betöltjük az adatokat:
+A konkrét esettanulmányunk a [Nemzeti
+Rákregiszter](http://www.onkol.hu/hu/nemzeti_rakregiszter) (NRR)
+adatainak vizualizálása lesz. Az NRR hazánk egyik legnagyobb hagyományú
+betegségregisztere, melye a rákos esetek számát gyűjti átfogóan, több
+mint egy évtizedre visszamenően Magyarországon. Ami a mostani
+szempontunkból még fontosabb, az adatok nyilvánosan elérhetőek, sőt, le
+is bonthatóak ráktípus (diagnózis), diagnózis éve, beteg életkora, neme
+és lakhelye (megye szinten) szerint. Ezért a többdimenziós
+adatvizualizálásra is kitűnő példa, ráadásul könnyen megfogalmazhatóak
+olyan kérdések, melyek – tényleg – fontosak a gyakorlatban, és melyeknél
+az adatvizualizáció nagyon fontos segítséget jelent.
+
+Nézzük is ezt meg\! Először betöltjük az adatokat:
 
 ``` r
 library( lattice )
@@ -40,27 +59,52 @@ RawData
     ## 1036799: 2015    Zala megye    Nő  85     D30 0       4092
     ## 1036800: 2015    Zala megye    Nő  85     D33 0       4092
 
-Alapgondolatok
-==============
+# Alapgondolatok
 
 Az adatvizualizációnak két fő kérdésre kell választ adnia.
 
--   Mi az ábrázolás *központi* célja? Ez meghatározza azt, hogy milyen jellegű ábrát kell használunk, vonaldiagramot, oszlopdiagramot, térképet, stb. A mostani példánkban ez legyen a következő kérdés: hogyan függ egy betegség előfordulása az életkortól? (Ez egy releváns orvosi kérdés, a legtöbb rák gyakoribb idősebb életkorban, de van, aminek gyerekkorban is van egy kisebb csúcsa stb. Az incidencia az esetek számának ráosztása a lakosságra és egységnyi időre, tipikusan esetszám/100 ezer fő/év mértékegységben szokás megadni. Természetesen számolhatunk valamilyen szűkített csoportra is, például férfiakra, ez esetben a számlálóban a férfi betegek száma van, de a nevezőbe is a férfilakosság nagyságát rakjuk, hogy konzisztensek maradjunk.) Az NRR adatai lehetővé teszik e kérdés vizsgálatát, csak épp önmagukban, mint számtenger, szinte használhatatlanok. A vizualizáció célja épp az, hogy e használhatatlan számtengert átalakítsuk olyan ábrává, melyet az orvosok, vagy akár az érdeklődő laikusok is jól meg tudnak érteni.
--   Mit kezdjünk a többi dimenzióval? A "többi" jelen esetben azt jelenti: azok a dimenziók, melyek nem az ábrázolás központi tárgyát képezik. Ezek azonban egyáltalán nem mellékesek, sőt, az átadott információtartalmaz, az ábra értelmezhetősége nagyban múlik azon, hogy ezeket a dimenziókat hogyan kezeljük.
+  - Mi az ábrázolás *központi* célja? Ez meghatározza azt, hogy milyen
+    jellegű ábrát kell használunk, vonaldiagramot, oszlopdiagramot,
+    térképet, stb. A mostani példánkban ez legyen a következő kérdés:
+    hogyan függ egy betegség előfordulása az életkortól? (Ez egy
+    releváns orvosi kérdés, a legtöbb rák gyakoribb idősebb életkorban,
+    de van, aminek gyerekkorban is van egy kisebb csúcsa stb. Az
+    incidencia az esetek számának ráosztása a lakosságra és egységnyi
+    időre, tipikusan esetszám/100 ezer fő/év mértékegységben szokás
+    megadni. Természetesen számolhatunk valamilyen szűkített csoportra
+    is, például férfiakra, ez esetben a számlálóban a férfi betegek
+    száma van, de a nevezőbe is a férfilakosság nagyságát rakjuk, hogy
+    konzisztensek maradjunk.) Az NRR adatai lehetővé teszik e kérdés
+    vizsgálatát, csak épp önmagukban, mint számtenger, szinte
+    használhatatlanok. A vizualizáció célja épp az, hogy e
+    használhatatlan számtengert átalakítsuk olyan ábrává, melyet az
+    orvosok, vagy akár az érdeklődő laikusok is jól meg tudnak érteni.
+  - Mit kezdjünk a többi dimenzióval? A “többi” jelen esetben azt
+    jelenti: azok a dimenziók, melyek nem az ábrázolás központi tárgyát
+    képezik. Ezek azonban egyáltalán nem mellékesek, sőt, az átadott
+    információtartalmaz, az ábra értelmezhetősége nagyban múlik azon,
+    hogy ezeket a dimenziókat hogyan kezeljük.
 
-Jelen anyag elsősorban a második kérdésre fog fókuszálni. A mostani példában a "fő" dimenzió az (esetszámból és lakosságszámból kiszámolt) incidencia és az életkor lesz, célszerűen előbbi a függőleges, utóbbi a vízszintes tengelyre kerül egy vonaldiagramon, a "többi" dimenzió pedig az év, megye, nem és diagnózis.
+Jelen anyag elsősorban a második kérdésre fog fókuszálni. A mostani
+példában a “fő” dimenzió az (esetszámból és lakosságszámból kiszámolt)
+incidencia és az életkor lesz, célszerűen előbbi a függőleges, utóbbi a
+vízszintes tengelyre kerül egy vonaldiagramon, a “többi” dimenzió pedig
+az év, megye, nem és diagnózis. 4 dimenzió van tehát, amivel “kezdeni
+kell” valamit, és a többdimenziós adatvizualizáció sava-borsa épp az
+lesz, hogy hogyan és mit kezdünk az egyes dimenziókkal.
 
-A vizualició elvégzésére alapvetően a `lattice` könyvtárat fogjuk használni, az adatbázis kezelésére pedig a `data.table` csomagot.
+A vizualició elvégzésére alapvetően a `lattice` könyvtárat fogjuk
+használni, az adatbázis kezelésére pedig a `data.table` csomagot.
 
-Dimenziók kezelése
-==================
+# Dimenziók kezelése
 
-A többdimenziós adatvizualizáció egyik fő kérdése tehát a "többi dimenzió" kezelése. Lássuk a módszereket!
+A többdimenziós adatvizualizáció egyik fő kérdése tehát a “többi
+dimenzió” kezelése. Lássuk a módszereket\!
 
-Dimenziótól megszabadulás szűkítéssel
--------------------------------------
+## Dimenziótól megszabadulás szűkítéssel
 
-Az egyik lehetőség, hogy a dimenziót azáltal tüntetjük el, hogy egyetlen értékre szűkítjük.
+Az egyik lehetőség, hogy a dimenziót azáltal tüntetjük el, hogy egyetlen
+értékre szűkítjük.
 
 Például egy konkrét kombinációt kiválasztva minden dimenzióra:
 
@@ -91,18 +135,23 @@ RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18" ]
 Ez már ábrázolható minden további megfontolás nélkül:
 
 ``` r
-xyplot( N/Population*100000 ~ Age,
+xyplot( N/Population*1e5 ~ Age,
         data = RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18" ],
         type = "l" )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
-Itt most kézzel számoltuk ki az incidenciát, de elegánsabb (és a későbbiekben jobban használható), ha ezt is az adatbázisban tesszük meg:
+Itt most kézzel számoltuk ki az incidenciát, de elegánsabb (és a
+későbbiekben jobban használható), ha ezt is az adatbázisban tesszük
+meg. (Bár a `lattice` támogatja az egyszerű műveletek formulában történő
+elvégzését – ezért működött az előbbi is – de erre jobb ha nem építünk,
+mert bonyolultabb műveleteknél, pláne, ha adatbázist is manipulálni
+kell, ez nem fog működni. A `data.table` azonban ilyenkor is használható
+– épp ez az egyik fő előnye.) Jobb tehát, ha eleve is ezt szokjuk meg:
 
 ``` r
-RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
-         .( Inc = N/Population*100000, Age ) ]
+RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18", .( Inc = N/Population*1e5, Age ) ]
 ```
 
     ##            Inc Age
@@ -125,26 +174,62 @@ RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
     ## 17: 422.470130  80
     ## 18: 522.304992  85
 
-Természetesen az ábrázolás ugyanez:
+Mivel most egyetlen sorig leszűkítettük (egy adott életkorra), így ez is
+jó, de vegyük észre, hogy igazából arról van szó, hogy az életkor
+szerint csoportosítunk:
+
+``` r
+RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
+         .( Inc = N/Population*1e5 ), .( Age ) ]
+```
+
+    ##     Age        Inc
+    ##  1:   0   0.000000
+    ##  2:   5   2.357184
+    ##  3:  10   0.000000
+    ##  4:  15   0.000000
+    ##  5:  20   1.919828
+    ##  6:  25   4.999792
+    ##  7:  30   0.000000
+    ##  8:  35   9.766817
+    ##  9:  40  14.182084
+    ## 10:  45  34.725839
+    ## 11:  50  41.542136
+    ## 12:  55  79.712151
+    ## 13:  60 153.391240
+    ## 14:  65 221.478724
+    ## 15:  70 270.972112
+    ## 16:  75 370.234939
+    ## 17:  80 422.470130
+    ## 18:  85 522.304992
+
+A későbbiek szempontjából jobb ezt megjegyezni, hiszen ha nem minden
+változó szerint szűkítünk, akkor csak ez fog működni.
+
+Természetesen az ábrázolás ugyanaz, mint a legelső esetben is volt:
 
 ``` r
 xyplot( Inc ~ Age,
         data = RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
-                        .( Inc = N/Population*100000, Age ) ],
+                        .( Inc = N/Population*1e5 ), .( Age ) ],
         type = "l" )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
-Dimenziótól megszabadulás aggregálással
----------------------------------------
+## Dimenziótól megszabadulás aggregálással
 
-A második lehetőség, hogy egy dimenziót megtartunk összes értékével, de az ezeket az értékeket aggregáljuk, például összegezzük.
+A második lehetőség, hogy egy dimenziót megtartunk összes értékével, de
+az ezeket az értékeket aggregáljuk, például összegezzük.
 
-Most a négy dimenzióból csak hármat szűkítsünk, a megyét nem: afölött aggregálunk. Íme:
+Most a négy dimenzióból csak hármat szűkítsünk, a megyét nem: afölött
+aggregálunk. A megoldás nagyon könnyű, egész egyszerűen ki kell hagynunk
+a megyét a szűkítések felsorolásából. Természetesen ne felejtsük el,
+hogy így már az esetszámot és a lélekszámot szummáznunk kell, hiszen
+minden életkori résztáblában 20 sor lesz (az összes megye):
 
 ``` r
-RawData[ Year==2015&Sex=="Férfi"&ICDCode=="C18", .( Inc = sum( N )/sum( Population )*100000 ), .( Age ) ]
+RawData[ Year==2015&Sex=="Férfi"&ICDCode=="C18", .( Inc = sum( N )/sum( Population )*1e5 ), .( Age ) ]
 ```
 
     ##     Age         Inc
@@ -167,27 +252,58 @@ RawData[ Year==2015&Sex=="Férfi"&ICDCode=="C18", .( Inc = sum( N )/sum( Populat
     ## 17:  80 422.9426434
     ## 18:  85 424.2411821
 
-(Az életkort már eddig is berakhattunk volna aggregációs argumentumba, de nem lett volna jelentősége. Most viszont már muszáj: ez a szintaktika azt jelenti, hogy életkori csoportokat veszünk, ez magyarul azt fogja jelenti, hogy a csoportban a 20 megye lesz, az összegzés tehát ezen 20 megye adatainak összeadását jelenti.)
+(Év, nem és daganattípus szerint szűkítettünk, így ezek eleve
+rögzítettek, majd pedig életkor szerint képeztünk résztáblákat, így az
+egyes résztáblákban az is le lesz rögzítve, ezért lesz 20 sor
+mindegyikben – hiszen már csak a megye maradt lerögzítetlen. Az
+összegzés tehát ezen 20 megye adatainak összeadását jelenti.)
 
-Ezt ábrázolva hasonló eredményt kapunk, de immár az összes megyére vonatkozik az eredmény:
+És persze nehogy `sum( N/Population )`-t írjunk, hiszen \(1/2+1/3\)
+nagyon nem ugyanaz mint \(2/5\).
+
+Ezt ábrázolva hasonló eredményt kapunk, de immár az összes megyére
+vonatkozik az eredmény:
 
 ``` r
 xyplot( Inc ~ Age,
         data = RawData[ Year==2015&Sex=="Férfi"&ICDCode=="C18",
-                        .( Inc = sum( N )/sum( Population )*100000 ), .( Age ) ],
+                        .( Inc = sum( N )/sum( Population )*1e5 ), .( Age ) ],
         type = "l" )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
-Dimenziótól megszabadulás külön ábrázolással
---------------------------------------------
+Természetesen nem muszáj csak egy dimenzió felett aggregálni. Mondjuk,
+hogy nem csak az összes megyére, hanem mindkét nemre vonatkozó adatokat
+szeretnénk, ez esetben egyetlen dolgunk van: a nemet is kihagyni a
+szűkítések listájából. (Az összegzés már eleve ott van, legfeljebb
+most nem 20, hanem 40 sor fog összeadódni.) A megoldás tehát:
 
-A harmadik lehetőség, hogy egy dimenziótól igazából nem szabadulunk meg, csak külön ábrázoljuk. A példa kedvéért a nemet vizsgáljuk (a másik három dimenziót továbbra is szűkítjük). Mivel igazából nem szabadulunk meg, ezért a szerint is csoportosítanunk kell:
+``` r
+xyplot( Inc ~ Age,
+        data = RawData[ Year==2015&ICDCode=="C18",
+                        .( Inc = sum( N )/sum( Population )*1e5 ), .( Age ) ],
+        type = "l" )
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+
+Az elv tehát nagyon egyszerű: ami szerint szeretnénk szűkíteni, azt
+írjuk bele a szűkítési listába – amit pedig nem írunk bele, a fölött
+automatikusan aggregálni fogunk. Csak ne felejtsük el a szummázást
+kiírni, és életkor szerint csoportosítani.
+
+## Dimenziótól megszabadulás külön ábrázolással
+
+A harmadik lehetőség, hogy egy dimenziótól igazából nem szabadulunk meg,
+csak külön ábrázoljuk. A példa kedvéért a nemet vizsgáljuk (a másik
+három dimenziót továbbra is szűkítjük). Mivel igazából nem szabadulunk
+meg, ezért a szerint is csoportosítanunk kell (természetesen az életkor
+mellett, és természetesen továbbra is szummáznunk kell):
 
 ``` r
 RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015,
-         .( Inc = sum( N )/sum( Population )*100000 ), .( Age, Sex ) ]
+         .( Inc = sum( N )/sum( Population )*1e5 ), .( Age, Sex ) ]
 ```
 
     ##     Age   Sex        Inc
@@ -229,21 +345,28 @@ RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015,
     ## 36:  85    Nő 349.342072
     ##     Age   Sex        Inc
 
-A külön ábrázolásnak két alapvető útja van.
+De ne feledjük: így igazából nem szabadultunk meg a dimenziótól – tehát
+ezt a függőben maradt dimenziót grafikus úton kell kezelnünk\! Ennek két
+alapvető útja van.
 
 ### Külön ábrázolás egy ábrán, de más színnel
 
-Az ábra marad ugyanaz, színnel különböztetjük meg a csoportokat (jelen esetben nem szerinti csoportokat):
+Az ábra marad ugyanaz, színnel különböztetjük meg a csoportokat (jelen
+esetben nem szerinti csoportokat):
 
 ``` r
 xyplot( Inc ~ Age, groups = Sex,
         data = RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015,
-                        .( Inc = sum( N )/sum( Population )*100000 ),
+                        .( Inc = sum( N )/sum( Population )*1e5 ),
                         .( Age, Sex ) ],
         type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ) )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-11-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
+
+Általánosságban az mondható, hogy ez a módszer teszi a görbéket jobban
+összehasonlíthatóvá, hiszen egymáson futnak (persze
+megkülönböztethetően).
 
 ### Külön ábrázolás külön paneleken
 
@@ -252,47 +375,110 @@ A másik lehetőség, hogy kis részábrákat, paneleket alkalmazunk:
 ``` r
 xyplot( Inc ~ Age | Sex,
         data = RawData[ ICDCode=="C18"&County=="Budapest"&Year==2015,
-                        .( Inc = sum( N )/sum( Population )*100000 ),
+                        .( Inc = sum( N )/sum( Population )*1e5 ),
                         .( Age, Sex ) ],
-        type = "l" )
+        type = "l", layout = c( 2, 1 ) )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-12-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
 
-A módszerek kombinálása
------------------------
+Itt az összevetés nehezebb, hiszen nem ugyanott vannak a görbék. De egy
+dologra fontos emlékeznünk: ha az érdekel minket, hogy a görbe
+balra-jobbra elmozdult-e, akkor érdemes az ábrákat egymás alá, ha az
+érdekel, hogy fel-le elmozdult-e, akkor egymás mellé raknunk.
 
-A dolog igazi sava-borsát (mondhatjuk: igazi erejét) az adja, amikor a különböző módszereket kombináljuk. Legyen mondjuk a cél a következő: diagnózis szerint szűkítünk, megyéket aggregáljuk, az éveket külön paneleken, a nemeket egy ábrán külön színekkel ábrázoljuk!
+## A módszerek kombinálása
 
-Ez első hallásra kicsit ijesztően hangozhat, de valójában a világon semmi bonyolultság nincs benne, egyszerűen kombinálni kell az eddig látott megoldásokat:
+A dolog igazi erejét az adja, amikor a különböző módszereket
+kombináljuk. Legyen mondjuk a cél a következő: diagnózis szerint
+szűkítünk, megyéket aggregáljuk, az éveket külön paneleken, a nemeket
+egy ábrán külön színekkel ábrázoljuk\!
+
+Ez első hallásra kicsit ijesztően hangozhat, de valójában a világon
+semmi bonyolultság nincs benne, egyszerűen kombinálni kell az eddig
+látott megoldásokat:
 
 ``` r
 xyplot( Inc ~ Age | factor( Year ), groups = Sex,
-        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*100000 ), .( Age, Sex, Year ) ],
+        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*1e5 ), .( Age, Sex, Year ) ],
         type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ), as.table = TRUE )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-13-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
 
-További lehetőségek
--------------------
+Fontos végiggondolni, hogy ez mit mutat meg jól\! Mivel a nemek vannak
+különböző színnel ábrázolva, ezért azok vethetőek jól össze, az évek,
+tehát az időbeli alakulás csak kevésbé.
 
-További csomagokkal egyéb speciális lehetőségek is elérhetőek. Például készítsük el az előbbi ábrát a `Hmisc` nevű csomaggal! Látszólag nem lesz nagy különbség, csak annyi történik, hogy az egyes görbék mellettük lesznek feliratozva (sokan ezt is jobban szeretik):
+Természetesen a dolog meg is fordítható:
+
+``` r
+xyplot( Inc ~ Age | Sex, groups = factor( Year ),
+        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*1e5 ), .( Age, Sex, Year ) ],
+        type = "l", auto.key = list( columns = 2, points = FALSE, lines = TRUE ), as.table = TRUE )
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+
+A probléma itt az, hogy a rengeteg szín miatt nehezen áttekinthető az
+ábra (ennél kicsit több is igaz: mivel a `lattice` egy idő után elkezdi
+reciklálni a színeket, így igazából nem is egyértelmű).
+
+Gondoljuk meg, hol itt a probléma: az év az valójában *ordinális*
+tulajdonság, de a fenti színezés ezt nem tükrözi (mondhatni:
+*nominális*). Az ember e ponton megkérdezhetné, hogy mégis, hogyan
+lehetne egy színezés ordinális?\! Például így:
+
+``` r
+xyplot( Inc ~ Age | Sex, groups = factor( Year ),
+        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*1e5 ), .( Age, Sex, Year ) ],
+        type = "l", auto.key = list( columns = 4, points = FALSE, lines = TRUE ), as.table = TRUE,
+        par.settings = list( superpose.line = list(
+                col = colorRampPalette( c( "green", "red" ) )( length( unique( RawData$Year ) ) ) ) ) )
+```
+
+<img src="README_files/figure-gfm/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
+
+Lehet, hogy az egyes konkrét éveket továbbra is nehéz leolvasni, de az
+*össztendencia* tökéletesen láthatóvá vált (férfiaknál romló helyzet
+időben, nőknél nincs érdemi változás) annak ellenére is, hogy ilyen sok
+görbe van az ábrán\! Mindössze azáltal, hogy ügyesen választottuk meg az
+adatvizualizációt.
+
+Visszatérve az eredeti gondolatra, láthatjuk, hogy minden dimenzióval
+kezdeni kell valamit (szűkítés, aggregálás, külön ábrázolás más színnel,
+külön ábrázolás más panelen), mivel pedig a dimenziók száma sem kevés,
+jelen példában öt, ki lehet számolni, hogy hány lehetséges megoldás van…
+Amit nagyon fontos érteni, hogy ezek mindegyike értelmes ábra, csak épp
+az a kérdés, hogy mire. Fordítva elmondva: azt kell jól érteni, hogy az
+egyes választások az adatok mely aspektusát teszik jól, jobban
+láthatóvá\!
+
+## További lehetőségek
+
+További csomagokkal egyéb speciális lehetőségek is elérhetőek. Például
+készítsük el az előbbi ábrát a `Hmisc` nevű csomaggal\! Látszólag nem
+lesz nagy különbség, csak annyi történik, hogy az egyes görbék mellettük
+lesznek feliratozva (sokan ezt is jobban szeretik, itt mondjuk nem
+annyira számít, de ha kevés panel lenne, viszont egy panelen sok
+különböző színű vonal, akkor sokkal inkább lenne jelentősége):
 
 ``` r
 xYplot( Inc ~ Age | factor( Year ), groups = Sex,
-        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*100000 ), .( Age, Sex, Year ) ],
+        data = RawData[ ICDCode=="C18", .( Inc = sum( N )/sum( Population )*1e5 ), .( Age, Sex, Year ) ],
         type = "l", as.table = TRUE )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-14-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
 
-Az igazi ereje azonban az a csomagnak, hogy konfidenciaintervallumok játszi könnyedséggel ábrázolhatóak. Ezek kiszámolása nem nehéz (egy leszűkítettebb példán, hogy jobban áttekinthető legyen):
+Az igazi ereje azonban az a csomagnak, hogy konfidenciaintervallumok
+játszi könnyedséggel ábrázolhatóak. Ezek kiszámolása nem nehéz (egy
+leszűkítettebb példán, hogy jobban áttekinthető legyen):
 
 ``` r
 RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
          with( binom.test( N, round( Population ) ),
-               list( est = estimate, cilwr = conf.int[ 1 ], ciupr = conf.int[ 2 ] ) ),
+               list( est = estimate, cilwr = conf.int[1], ciupr = conf.int[2] ) ),
          .( Age ) ]
 ```
 
@@ -316,28 +502,47 @@ RawData[ Year==2015&County=="Budapest"&Sex=="Férfi"&ICDCode=="C18",
     ## 17:  80 4.224701e-03 3.255009e-03 5.391691e-03
     ## 18:  85 5.223050e-03 3.997505e-03 6.704237e-03
 
+(Ne felejtsük el, hogy a `data.table`-ben a `.( )` szintaktika igazából
+a `list`-et helyettesíti. Viszont mivel itt mi – a `with`-del – eleve
+listát adunk vissza, így a külön `.( )`-re nincs szükség.)
+
 Most terjesszük ki ezzel az előző ábrát:
 
 ``` r
-xYplot( Cbind( est*100000, cilwr*100000, ciupr*100000 ) ~ Age | factor( Year ), groups = Sex,
-        data = RawData[ ICDCode=="C18",
-                        with( binom.test( sum( N ), round( sum( Population ) ) ),
-                              list( est = estimate, cilwr = conf.int[ 1 ], ciupr = conf.int[ 2 ] ) ),
-                        .( Age, Sex, Year ) ],
-        type = "l", as.table = TRUE )
+xYplot( Cbind( est*1e5, cilwr*1e5, ciupr*1e5 ) ~ Age | factor( Year ), groups = Sex, ylab = "Inc",
+        data = RawData[ ICDCode=="C18", with( binom.test( sum( N ), round( sum( Population ) ) ),
+                                              list( est = estimate, cilwr = conf.int[1], ciupr = conf.int[2] ) ),
+                        .( Age, Sex, Year ) ], type = "l", as.table = TRUE )
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-16-1.png)
+<img src="README_files/figure-gfm/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
 
-Eljutottunk oda, egyszerű lépések összerakásával, hogy ilyen ábrát már igazán nem lenne könnyű más módon előállítani! A dolog igazi ereje, hogy mindezt 6 sorban, de ami még jobb, úgy, hogy a kód kis gyakorlattal szinte kiolvasható mint egy angol mondat.
+Eljutottunk oda, egyszerű lépések összerakásával, hogy ilyen ábrát már
+igazán nem lenne könnyű más módon előállítani\! A dolog igazi ereje,
+hogy mindezt 4 (\!) sorban, de ami még jobb, úgy, hogy a kód kis
+gyakorlattal szinte kiolvasható mint egy angol mondat.
 
-Interaktívvá tétel webes felületen
-----------------------------------
+## Interaktívvá tétel webes felületen
 
-A fenti megoldás inherens hátránya, hogy `R`-et igényel. A lefuttatása feltétlenül, ha meg valamit módosítani kell (például másik ráktípusra szeretnénk szűkíteni), akkor valamilyen szinten még módosítani is kell tudni a kódot. Mennyivel jobb lenne egy olyan megoldás, mely `R` tudás (és egyáltalán, telepített `R`) nélkül is használható, és kényelmesen kezelhető!
+A fenti megoldás inherens hátránya, hogy `R`-et igényel. A lefuttatása
+feltétlenül, ha meg valamit módosítani kell (például másik ráktípusra
+szeretnénk szűkíteni), akkor valamilyen szinten még módosítani is kell
+tudni a kódot. Mennyivel jobb lenne egy olyan megoldás, mely `R` tudás
+(és egyáltalán, telepített `R`) nélkül is használható, és kényelmesen
+kezelhető\!
 
-Erre kínál megoldást a `shiny` csomag. Sőt, ennél többre is, ezzel ugyanis a webre tehetjük ki a megoldásunkat, jól kezelhető webes felülettel, mely egyrészt semmilyen `R` tudást nem igényel, másrészt nagyon kényelmessé teszi az ábrázolás testreszabását (például a szűkítések átállítását). Az egészben az a jó, hogy webes felület kialakítása nem igényel semmilyen webes tudást, tisztán `R`-ben elintézhető!
+Erre kínál megoldást a `shiny` csomag. Sőt, ennél többre is, ezzel
+ugyanis a webre tehetjük ki a megoldásunkat, jól kezelhető webes
+felülettel, mely egyrészt semmilyen `R` tudást nem igényel, másrészt
+nagyon kényelmessé teszi az ábrázolás testreszabását (például a
+szűkítések átállítását). Az egészben az a jó, hogy webes felület
+kialakítása *maga* sem igényel semmilyen webes tudást, tisztán `R`-ben
+elintézhető\!
 
-Minderre mutat példát a <http://research.physcon.uni-obuda.hu/> címen elérhető 'Rákregiszter vizualizátor' alkalmazás.
+Minderre mutat példát a <https://research.physcon.uni-obuda.hu/> címen
+elérhető ‘Rákregiszter vizualizátor’ alkalmazás.
 
-Érdemes megjegyezni, hogy ennek *teljes* kódja (beleértve a webes interfész kialakítását *és* az összes ábrázolási lehetőség összes kódját, többféle grafikontól a térképen át a regressziós modellezésig) nincs 400 sor!
+Érdemes megjegyezni, hogy ennek *teljes* kódja (beleértve a webes
+interfész kialakítását *és* az összes ábrázolási lehetőség összes
+kódját, többféle grafikontól a térképen át a regressziós modellezésig)
+nincs 450 sor\!
